@@ -1,5 +1,6 @@
 import bencodepy
 import socket
+import codecs
 
 from hashlib import sha1
 from random import getrandbits, randint
@@ -123,10 +124,10 @@ class btdht(Thread):
             elif msg[b"y"] == b"q":
                 try:
                     self.process_request_func[msg[b"q"]](msg, address)
-                except IndexError:
+                except KeyError:
                     self.play_dead(msg, address)
         except Exception:
-            pass
+            print("Error in process_message")
 
     def process_find_node_response(self, msg, address):
         nodes = decode_krpc_nodes(msg[b"r"][b"nodes"])
@@ -158,7 +159,15 @@ class btdht(Thread):
     def process_announce_peer_request(self, msg, address):
         try:
             infohash = msg[b"a"][b"info_hash"]
-            self.master.log(infohash)
+            token = msg[b"a"][b"token"]
+            name = msg[b"a"][b"name"] if msg[b"a"].get(b"name") else None
+
+            if infohash[:TOKEN_LENGTH] == token:
+                if msg[b"a"].get(b"implied_port") and msg[b"a"][b"implied_port"] != 0:
+                    port = address[1]
+                else:
+                    port = msg[b"a"][b"port"]
+                self.master.log(infohash, name, address)
         except Exception:
             pass
         finally:

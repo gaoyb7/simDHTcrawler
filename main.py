@@ -4,8 +4,8 @@ import codecs
 from btdht import btdht
 
 class Master(object):
-    def log(self, infohash):
-        print("%s" % codecs.encode(infohash, "hex_codec").decode())
+    def log(self, infohash, name, address):
+        print("%s %s" % (codecs.encode(infohash, "hex_codec").decode(), name.decode()))
 
 
 if __name__ == "__main__":
