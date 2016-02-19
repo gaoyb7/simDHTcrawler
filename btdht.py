@@ -111,7 +111,6 @@ class btdht(Thread):
                 (data, address) = self.socket.recvfrom(PACKET_SIZE)
                 msg = bencodepy.decode(data)
                 self.process_message(msg, address)
-                print(len(self.nodes))
             except Exception:
                 pass
 
@@ -127,12 +126,10 @@ class btdht(Thread):
                 except IndexError:
                     self.play_dead(msg, address)
         except Exception:
-            print("Error in process message")
+            pass
 
     def process_find_node_response(self, msg, address):
-        print("in process find node response")
         nodes = decode_krpc_nodes(msg[b"r"][b"nodes"])
-        print("ok")
         for node in nodes:
             if len(node.nid) != 20: continue
             if node.ip == self.bind_ip: continue
