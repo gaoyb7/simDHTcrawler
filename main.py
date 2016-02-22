@@ -9,6 +9,6 @@ class Master(object):
 
 
 if __name__ == "__main__":
-    dht = btdht(Master(), "0.0.0.0", 6882, 200)
+    dht = btdht(Master(), "0.0.0.0", 6881, 200)
     dht.start()
     dht.auto_send_find_node()
