@@ -17,7 +17,8 @@ from knode import Knode
 BOOTSTRAP_NODES = (
     ("dht.transmissionbt.com", 6881),
     ("router.utorrent.com", 6881),
-    ("router.bittorrent.com", 6881)
+    ("router.bittorrent.com", 6881),
+    ("router.bitcomet.com", 6881)
 )
 
 TID_LENGTH = 2
