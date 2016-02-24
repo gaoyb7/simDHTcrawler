@@ -1,8 +1,9 @@
 """
+Fetch metadata from DHT network
+
 Reference:
-Bittorrent Protocol: https://zh.wikibooks.org/zh/BitTorrent%E5%8D%8F%E8%AE%AE%E8%A7%84%E8%8C%83
-BEPs 09: http://bittorrent.org/beps/bep_0009.html
-BEPs 10: http://bittorrent.org/beps/bep_0010.html
+BEP-09: http://bittorrent.org/beps/bep_0009.html
+BEP-10: http://bittorrent.org/beps/bep_0010.html
 """
 import socket
 import bencodepy
@@ -12,15 +13,14 @@ from struct import pack, unpack
 
 
 BT_PROTOCOL = b"BitTorrent protocol"
-BT_EXT_MSG_ID = b"\x14"
-BT_EXT_HANDSHAKE_ID = b"\x00"
+
 
 def send_msg(s, msg):
     msg_len = pack(">I", len(msg))
     s.send(msg_len + msg)
 
 
-def send_handshake(s, nid, infohash):
+def handshake(s, nid, infohash):
     pstr = BT_PROTOCOL
     pstrlen = chr(len(BT_PROTOCOL)).encode()
     reserved = b"\x00\x00\x00\x00\x00\x10\x00\x00"
@@ -28,13 +28,13 @@ def send_handshake(s, nid, infohash):
     s.send(msg)
 
 
-def send_ext_handshake(s):
-    msg_body = {"m": {"ut_metadata": 3}}
-    msg = BT_EXT_MSG_ID + BT_EXT_HANDSHAKE_ID + bencodepy.encode(msg_body)
+def ext_handshake(s):
+    msg_body = {"m": {"ut_metadata": 1}}
+    msg = b"\x14\x00" + bencodepy.encode(msg_body)
     send_msg(s, msg)
 
 
-def chk_handshake_response(msg, infohash):
+def check_handshake_response(msg, infohash):
     try:
         pstrlen, msg = ord(msg[:1]), msg[1:]
         if pstrlen != len(BT_PROTOCOL):
@@ -53,24 +53,40 @@ def chk_handshake_response(msg, infohash):
     return True
 
 
-def fetch_metadata(nid, infohash, address):
+def decode_ext_handshake_msg(msg):
+    str_ut_metadata = b"ut_metadata"
+    ut_metadata = int(msg[msg.index(str_ut_metadata) + len(str_ut_metadata) + 1])
+
+    str_metadata_size = b"metadata_size"
+    start = msg.index(str_metadata_size) + len(str_ut_metadata) + 1
+    msg = msg[start:]
+    metadata_size = int(msg[:msg.index(b"e")])
+
+    return ut_metadata, metadata_size
+
+
+def fetch_metadata(nid, infohash, address, timeout=5):
     try:
         print("in fetch_metadata")
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(5)
+        s.settimeout(timeout)
         s.connect(address)
 
-        send_handshake(s, nid, infohash)
+        # handshake
+        handshake(s, nid, infohash)
         msg = s.recv(4096)
 
-        if not chk_handshake_response(msg, infohash):
-            print("error in chk handshake")
+        # verification
+        if not check_handshake_response(msg, infohash):
+            print("error in check handshake")
             return
 
-        send_ext_handshake(s)
+        # advertize to support ut_metadata(BEP-09)
+        ext_handshake(s)
         msg = s.recv(4096)
 
-        print(msg)
+        ut_metadata, metadata_size = decode_ext_handshake_msg(msg)
+        print(ut_metadata, metadata_size)
     except socket.timeout:
         print("timeout")
     except Exception:
