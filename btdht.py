@@ -27,12 +27,11 @@ PACKET_SIZE = 65536
 
 
 def gen_id(length):
-    #return "".join(chr(randint(0, 255)) for _ in range(length))
-    return bytearray(getrandbits(8) for i in range(length))
+    return "".join(chr(randint(0, 255)) for _ in range(length))
 
 
 def gen_node_id():
-    return sha1(gen_id(20)).digest()
+    return sha1(gen_id(20).encode()).digest()
 
 
 def decode_krpc_nodes(nodes_field):

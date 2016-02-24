@@ -11,3 +11,7 @@ def send_handshake(s, infohash):
     reserved = b"\x00\x00\x00\x00\x00\x10\x00\x00"
     msg = header + reserved + infohash + nid
     s.send(msg)
+
+
+def send_extension_handshake(s, infohash):
+    pass
