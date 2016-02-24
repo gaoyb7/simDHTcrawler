@@ -140,7 +140,6 @@ def fetch_metadata(nid, infohash, address, timeout=5):
     except socket.timeout:
         print("timeout")
     except Exception as e:
-        print("err")
         print(e)
     finally:
         s.close()
