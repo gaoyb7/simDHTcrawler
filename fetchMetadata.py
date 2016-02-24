@@ -10,6 +10,8 @@ import bencodepy
 
 from btdht import gen_node_id
 from struct import pack, unpack
+from math import ceil
+from time import time
 
 
 BT_PROTOCOL = b"BitTorrent protocol"
@@ -21,6 +23,10 @@ def send_msg(s, msg):
 
 
 def handshake(s, nid, infohash):
+    """
+    Send handshake message
+    Format: <pstrlen><pstr><reserved><info_hash><peer_id>
+    """
     pstr = BT_PROTOCOL
     pstrlen = chr(len(BT_PROTOCOL)).encode()
     reserved = b"\x00\x00\x00\x00\x00\x10\x00\x00"
@@ -29,6 +35,9 @@ def handshake(s, nid, infohash):
 
 
 def ext_handshake(s):
+    """
+    Format: <length prefix><message ID><payload>
+    """
     msg_body = {"m": {"ut_metadata": 1}}
     msg = b"\x14\x00" + bencodepy.encode(msg_body)
     send_msg(s, msg)
@@ -66,6 +75,33 @@ def decode_ext_handshake_msg(msg):
     return ut_metadata, metadata_size
 
 
+def send_request_metadata(s, ut_metadata, i):
+    msg_body = {"m": {"msg_type": 0, "piece": i}}
+    msg = b"\x14" + chr(ut_metadata).encode() + bencodepy.encode(msg_body)
+    send_msg(s, msg)
+
+
+def recv_piece(s, timeout=5):
+    s.setblocking(0)
+    data_list = []
+    time_begin = time()
+    
+    while True:
+        sleep(0.05)
+        if data_list and time()-begin > timeout:
+            break
+        elif time()-begin() > timeout * 2:
+            break
+        try:
+            data = s.recv(1024)
+            if data:
+                data_list.append(data)
+                time_begin = time()
+        except Exception:
+            pass
+    return b"".join(data_list)
+
+
 def fetch_metadata(nid, infohash, address, timeout=5):
     try:
         print("in fetch_metadata")
@@ -88,6 +124,16 @@ def fetch_metadata(nid, infohash, address, timeout=5):
 
         ut_metadata, metadata_size = decode_ext_handshake_msg(msg)
         print("ut_metadata", ut_metadata, "metadata_size", metadata_size)
+
+        metadata = []
+        piece_tot = int(ceil(metadata_size / (1024 * 16)))
+        for i in range(piece_tot):
+            send_request_metadata(s, ut_metadata, i)
+            piece = recv_piece(s, timeout)
+            metadata.append(piece)
+
+        metadata = b"".join(metadata)
+        print(metadata)
 
     except socket.timeout:
         print("timeout")
