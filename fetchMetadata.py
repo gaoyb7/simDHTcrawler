@@ -106,7 +106,6 @@ def recv_piece(s, timeout=5):
 
 def fetch_metadata(nid, infohash, address, timeout=5):
     try:
-        print("in fetch_metadata")
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(timeout)
         s.connect(address)
@@ -117,7 +116,6 @@ def fetch_metadata(nid, infohash, address, timeout=5):
 
         # verification
         if not check_handshake_response(msg, infohash):
-            print("error in check handshake")
             return
 
         # advertize to support ut_metadata(BEP-09)
@@ -125,7 +123,7 @@ def fetch_metadata(nid, infohash, address, timeout=5):
         msg = s.recv(4096)
 
         ut_metadata, metadata_size = decode_ext_handshake_msg(msg)
-        print("ut_metadata", ut_metadata, "metadata_size", metadata_size)
+        #print("ut_metadata", ut_metadata, "metadata_size", metadata_size)
 
         metadata = []
         piece_tot = int(ceil(metadata_size / (1024 * 16)))
@@ -138,8 +136,9 @@ def fetch_metadata(nid, infohash, address, timeout=5):
         print(bencodepy.decode(metadata)[b"name"].decode(), "size", len(metadata))
 
     except socket.timeout:
-        print("timeout")
+        pass
     except Exception as e:
-        print(e)
+        #print(e)
+        pass
     finally:
         s.close()

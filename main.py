@@ -21,7 +21,7 @@ class Master(Thread):
     def fetch(self):
         for i in range(100):
             if self.que.qsize() == 0:
-                time.sleep(1)
+                sleep(1)
                 continue
             r = self.que.get()
             t = Thread(target=fetch_metadata, args=(r[0], r[1], r[2]))
@@ -31,7 +31,7 @@ class Master(Thread):
     def log(self, nid, infohash, name, address):
         #print("%s %s" % (codecs.encode(infohash, "hex_codec").decode(), name.decode()))
         #fetch_metadata(nid, infohash, address)
-        Queue.put([nid, infohash, address])
+        self.que.put([nid, infohash, address])
 
 
 if __name__ == "__main__":
