@@ -5,6 +5,7 @@ BEPs 09: http://bittorrent.org/beps/bep_0009.html
 BEPs 10: http://bittorrent.org/beps/bep_0010.html
 """
 import socket
+import bencodepy
 
 from btdht import gen_node_id
 from struct import pack, unpack
@@ -35,8 +36,8 @@ def send_ext_handshake(s):
 
 def chk_handshake_response(msg, infohash):
     try:
-        pstrlen, msg = msg[:1], msg[1:]
-        if pstrlen != len(BT_PROTOCOL)
+        pstrlen, msg = ord(msg[:1]), msg[1:]
+        if pstrlen != len(BT_PROTOCOL):
             return False
     except Exception:
         return False
@@ -54,17 +55,25 @@ def chk_handshake_response(msg, infohash):
 
 def fetch_metadata(nid, infohash, address):
     try:
+        print("in fetch_metadata")
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(5)
         s.connect(address)
 
         send_handshake(s, nid, infohash)
-        msg = s.recv(65536)
+        msg = s.recv(4096)
 
         if not chk_handshake_response(msg, infohash):
+            print("error in chk handshake")
             return
 
         send_ext_handshake(s)
-        msg = s.recv(65536)
+        msg = s.recv(4096)
 
         print(msg)
+    except socket.timeout:
+        print("timeout")
+    except Exception:
+        pass
+    finally:
+        s.close()
