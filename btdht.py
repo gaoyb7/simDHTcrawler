@@ -69,6 +69,7 @@ class btdht(Thread):
         self.socket.bind((self.bind_ip, self.bind_port))
 
         self.process_request_func = {
+            b"ping": self.process_ping_request,
             b"get_peers": self.process_get_peers_request,
             b"announce_peer": self.process_announce_peer_request
         }
@@ -135,6 +136,20 @@ class btdht(Thread):
             if node.ip == self.bind_ip: continue
             if node.port < 1 or node.port > 65535: continue
             self.nodes.append(node)
+
+    def process_ping_request(self, msg, address):
+        try:
+            tid = msg[b"t"]
+            msg = {
+                "t": tid,
+                "y": "r",
+                "r": {
+                    "id": self.nid
+                }
+            }
+            self.send_krpc(msg, address)
+        except Exception:
+            pass
 
     def process_get_peers_request(self, msg, address):
         try:
