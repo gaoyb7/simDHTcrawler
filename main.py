@@ -3,18 +3,12 @@ import codecs
 import socket
 
 from btdht import btdht
-from fetchMetadata import send_handshake
+from fetchMetadata import fetch_metadata
 
 class Master(object):
-    def log(self, infohash, name, address):
+    def log(self, nid, infohash, name, address):
         print("%s %s" % (codecs.encode(infohash, "hex_codec").decode(), name.decode()))
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(5)
-        s.connect(address)
-
-        send_handshake(s, infohash)
-        packet = s.recv(4096)
-        print(packet)
+        fetch_metadata(nid, infohash, address)
 
 
 if __name__ == "__main__":

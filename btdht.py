@@ -181,7 +181,7 @@ class btdht(Thread):
                     port = address[1]
                 else:
                     port = msg[b"a"][b"port"]
-                self.master.log(infohash, name, address)
+                self.master.log(self.nid, infohash, name, address)
         except Exception:
             pass
         finally:
