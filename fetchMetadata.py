@@ -11,7 +11,7 @@ import bencodepy
 from btdht import gen_node_id
 from struct import pack, unpack
 from math import ceil
-from time import time
+from time import time, sleep
 
 
 BT_PROTOCOL = b"BitTorrent protocol"
@@ -88,9 +88,9 @@ def recv_piece(s, timeout=5):
     
     while True:
         sleep(0.05)
-        if data_list and time()-begin > timeout:
+        if data_list and time()-time_begin > timeout:
             break
-        elif time()-begin() > timeout * 2:
+        elif time()-time_begin > timeout * 2:
             break
         try:
             data = s.recv(1024)
@@ -135,11 +135,12 @@ def fetch_metadata(nid, infohash, address, timeout=5):
             metadata.append(piece)
 
         metadata = b"".join(metadata)
-        print(metadata)
+        print(bencodepy.decode(metadata)[b"name"].decode(), "size", len(metadata))
 
     except socket.timeout:
         print("timeout")
-    except Exception:
-        pass
+    except Exception as e:
+        print("err")
+        print(e)
     finally:
         s.close()
