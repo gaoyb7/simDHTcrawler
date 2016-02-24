@@ -99,7 +99,9 @@ def recv_piece(s, timeout=5):
                 time_begin = time()
         except Exception:
             pass
-    return b"".join(data_list)
+    pkg = b"".join(data_list)
+    pkg = pkg[pkg.index(b"ee")+2:]
+    return pkg
 
 
 def fetch_metadata(nid, infohash, address, timeout=5):
