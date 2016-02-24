@@ -55,10 +55,11 @@ def check_handshake_response(msg, infohash):
 
 def decode_ext_handshake_msg(msg):
     str_ut_metadata = b"ut_metadata"
-    ut_metadata = int(msg[msg.index(str_ut_metadata) + len(str_ut_metadata) + 1])
+    ut_metadata = chr(msg[msg.index(str_ut_metadata) + len(str_ut_metadata) + 1])
+    ut_metadata = int(ut_metadata)
 
     str_metadata_size = b"metadata_size"
-    start = msg.index(str_metadata_size) + len(str_ut_metadata) + 1
+    start = msg.index(str_metadata_size) + len(str_metadata_size) + 1
     msg = msg[start:]
     metadata_size = int(msg[:msg.index(b"e")])
 
@@ -86,7 +87,8 @@ def fetch_metadata(nid, infohash, address, timeout=5):
         msg = s.recv(4096)
 
         ut_metadata, metadata_size = decode_ext_handshake_msg(msg)
-        print(ut_metadata, metadata_size)
+        print("ut_metadata", ut_metadata, "metadata_size", metadata_size)
+
     except socket.timeout:
         print("timeout")
     except Exception:
