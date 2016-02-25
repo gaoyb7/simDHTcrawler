@@ -1,10 +1,10 @@
 import bencodepy
 import codecs
 import socket
+import threading
 
 from btdht import btdht
 from fetchMetadata import fetch_metadata
-from threading import Thread
 from queue import Queue
 from time import sleep
 
@@ -15,8 +15,20 @@ class Master(Thread):
         self.que = Queue()
 
     def run(self):
+        #while True:
+        #    self.fetch()
         while True:
-            self.fetch()
+            if threading.activeCount() < 20:
+                if sel.que.qsize() == 0:
+                    sleep(1)
+                    continue
+                r = self.que.get()
+                t = threading.Thread(target=fetch_metadata, args=(r[0], r[1], r[2]))
+                t.setDaemon(True)
+                t.start()
+            else:
+                sleep(1)
+
 
     def fetch(self):
         for i in range(100):
@@ -24,7 +36,7 @@ class Master(Thread):
                 sleep(1)
                 continue
             r = self.que.get()
-            t = Thread(target=fetch_metadata, args=(r[0], r[1], r[2]))
+            t = threading.Thread(target=fetch_metadata, args=(r[0], r[1], r[2]))
             t.setDaemon(True)
             t.start()
 
