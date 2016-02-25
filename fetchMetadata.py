@@ -104,6 +104,21 @@ def recv_piece(s, timeout=5):
     return pkg
 
 
+def get_length(metadata):
+    length = 0
+    if metadata.get(b'files'):
+        for f in metadata[b'files']:
+            length += x[b'length']
+    else:
+        length += metadata[b'length']
+
+    if length < 1024:
+        return str(length) + "B"
+    elif length < 1024 ** 2:
+        return str(int(length / 1024)) + "KB"
+    else:
+        return str(int(length / 1024 / 1024)) + "MB"
+
 def fetch_metadata(nid, infohash, address, timeout=5):
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -132,13 +147,13 @@ def fetch_metadata(nid, infohash, address, timeout=5):
             piece = recv_piece(s, timeout)
             metadata.append(piece)
 
-        metadata = b"".join(metadata)
-        print(bencodepy.decode(metadata)[b"name"].decode(), "size", len(metadata))
-
+        metadata = bencodepy.decode(b"".join(metadata))
+        print(metadata[b"name"].decode(), "size", get_length(metadata))
     except socket.timeout:
         pass
     except Exception as e:
         #print(e)
         pass
     finally:
-        s.close()
+        if s:
+            s.close()
