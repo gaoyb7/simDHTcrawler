@@ -8,7 +8,7 @@ from fetchMetadata import fetch_metadata
 from queue import Queue
 from time import sleep
 
-class Master(Thread):
+class Master(threading.Thread):
     def __init__(self):
         super().__init__()
         self.setDaemon(True)
@@ -18,8 +18,8 @@ class Master(Thread):
         #while True:
         #    self.fetch()
         while True:
-            if threading.activeCount() < 20:
-                if sel.que.qsize() == 0:
+            if threading.activeCount() < 200:
+                if self.que.qsize() == 0:
                     sleep(1)
                     continue
                 r = self.que.get()
@@ -41,9 +41,11 @@ class Master(Thread):
             t.start()
 
     def log(self, nid, infohash, name, address):
-        #print("%s %s" % (codecs.encode(infohash, "hex_codec").decode(), name.decode()))
+        print("%s %s" % (codecs.encode(infohash, "hex_codec").decode(), name.decode()))
         #fetch_metadata(nid, infohash, address)
-        self.que.put([nid, infohash, address])
+        #self.que.put([nid, infohash, address])
+        #print(self.que.qsize())
+        #print(infohash, self.que.qsize(), threading.activeCount())
 
 
 if __name__ == "__main__":
