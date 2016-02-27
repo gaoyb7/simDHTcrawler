@@ -25,18 +25,37 @@ def about():
 
 @app.route("/search")
 def search():
-    msg = "Total torrent:  " + str(torrent_count()) + "</br>" + search_form
-    msg += "</br>"
-    msg += "Result: </br>"
+    page = "Total torrent:  " + str(torrent_count()) + "</br>" + search_form
+    page += "</br>"
+    page += "Result: </br>"
 
-    name = request.args.get('kw')
-    cmd = "select * from hash_tab where upper(name) like " + "'%" + name.upper() + "%'"
-    r = conn.execute(text(cmd))
+    kw = request.args.get("kw").strip()
+    if kw == "":
+        return "None"
+
+    kw = ":* & ".join(kw.split()) + ":*"
+
+    precheck_cmd = '''select to_tsquery('english', '%s')''' % kw
+
+    r = conn.execute(precheck_cmd)
+
+    print(precheck_cmd)
+    if r.fetchone()[0] == "":
+        return "None"
+
+    cmd = '''select * from hash_tab where to_tsvector('english', name) @@ \
+            to_tsquery('english', '%s')''' % kw
+
+    r = conn.execute(cmd)
+
+    page = "Total torrents:  " + str(torrent_count()) + "</br>" + search_form
+    page += "</br>"
+    page += "Result: " + str(r.rowcount) + " items</br>"
     for item in r:
-        msg += "Name: " + item[1] + "</br>"
-        msg += "Magnet: " + to_magnet(item[0], item[1]) + "</br>"
-        msg += "</br>"
-    return msg
+        page += "Name: " + item[1] + "</br>"
+        page += "Magnet: " + to_magnet(item[0], item[1]) + "</br>"
+        page += "</br>"
+    return page 
 
 
 def to_magnet(infohash, name):
