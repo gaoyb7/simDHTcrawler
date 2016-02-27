@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, text
 
 app = Flask(__name__)
 
-engine = create_engine("postgresql://gaoyb7@localhost/dht")
+engine = create_engine("postgresql://gaoyb7@localhost/dht_demo")
 conn = engine.connect()
 search_form = \
     """
@@ -15,7 +15,7 @@ search_form = \
 
 @app.route("/")
 def main_page():
-    return "Total torrent:  " + str(torrent_count()) + "</br>" + search_form
+    return "Total torrents:  " + str(torrent_count()) + "</br>" + search_form
 
 
 @app.route("/about")

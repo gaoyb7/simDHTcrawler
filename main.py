@@ -28,7 +28,7 @@ class Master(threading.Thread):
     def log_in_database_demo(self, infohash, name):
         try:
             self.conn.execute(self.ins, infohash=infohash, name=name)
-        except Exception:
+        except Exception as e:
             pass
 
     def logger(self):
@@ -70,7 +70,7 @@ class Master(threading.Thread):
     def log(self, nid, infohash, name, address):
         print("%s %s" % (codecs.encode(infohash, "hex_codec").decode(), name.decode()))
         #fetch_metadata(nid, infohash, address)
-        self.que.put([nid, infohash, address])
+        self.que.put([nid, codecs.encode(infohash, "hex_codec").decode(), name.decode()])
         #print(self.que.qsize())
         #print(infohash, self.que.qsize(), threading.activeCount())
 
