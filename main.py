@@ -7,8 +7,10 @@ from btdht import btdht
 from fetchMetadata import fetch_metadata
 from queue import Queue
 from time import sleep
-from sqlalchemy import create_engine, Table, String
+from sqlalchemy import create_engine, Table, String, MetaData, Column
 from sqlalchemy.sql import select
+
+metadata = MetaData()
 
 hash_tab = Table("hash_tab", metadata,
                  Column("infohash", String(40), primary_key=True),
@@ -34,7 +36,7 @@ class Master(threading.Thread):
             if self.que.empty():
                 sleep(1)
             else:
-                r = sel.que.get()
+                r = self.que.get()
                 self.log_in_database_demo(r[1], r[2])
 
     def run(self):
