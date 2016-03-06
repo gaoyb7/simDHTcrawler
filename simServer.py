@@ -55,7 +55,7 @@ def search():
         page += "Name: " + item[1] + "</br>"
         page += "Magnet: " + to_magnet(item[0], item[1]) + "</br>"
         page += "</br>"
-    return page 
+    return page
 
 
 def to_magnet(infohash, name):

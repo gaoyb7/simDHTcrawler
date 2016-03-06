@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block body %}
+<br>
+<div class="pure-g">
+    <div class="pure-u-1">
+        <h3>Search result: {{ match_torrents_count }} items</h3>
+        <table class="pure-table pure-table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Magnet</th>
+                </tr>
+            </thead>
+             <tbody>
+                 <tr>
+                     <td>SNIS-409</td>
+                     <td>magnet:?xt=urn:btih:21ef9bf7a86b62a749d416b7bd1519b91c471b89&dn=SNIS-409</td>
+                 </tr>
+                 <tr>
+                     <td>Hudejuwiy.1996.x264.BDRip.(1080p).olegek70.mkv</td>
+                     <td>magnet:?xt=urn:btih:9e7e03598b2e8714ad93cd54f9b80fb2e0eb244f&dn=Hudejuwiy.1996.x264.BDRip.(1080p).olegek70.mkv</td>
+                 </tr>
+             </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

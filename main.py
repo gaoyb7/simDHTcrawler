@@ -22,7 +22,7 @@ class Master(threading.Thread):
         super().__init__()
         self.setDaemon(True)
         self.que = Queue()
-        self.conn = create_engine("postgresql://gaoyb7:gyb@localhost/dht_demo").connect()
+        self.conn = create_engine("postgresql://gaoyb7@localhost/dht_demo").connect()
         self.ins = hash_tab.insert()
 
     def log_in_database_demo(self, infohash, name):
