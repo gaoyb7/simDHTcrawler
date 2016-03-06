@@ -2,6 +2,7 @@ from flask import Flask, url_for, request
 from sqlalchemy import create_engine, text
 
 app = Flask(__name__)
+app.debug = False
 
 engine = create_engine("postgresql://gaoyb7@localhost/dht_demo")
 conn = engine.connect()
@@ -29,7 +30,7 @@ def search():
     page += "</br>"
     page += "Result: </br>"
 
-    kw = request.args.get("kw").strip()
+    kw = request.args.get("kw").strip().replace("-", " ")
     if kw == "":
         return "None"
 
@@ -51,7 +52,11 @@ def search():
     page = "Total torrents:  " + str(torrent_count()) + "</br>" + search_form
     page += "</br>"
     page += "Result: " + str(r.rowcount) + " items</br>"
+    ct = 0
     for item in r:
+        ct += 1
+        if ct > 100:
+            break
         page += "Name: " + item[1] + "</br>"
         page += "Magnet: " + to_magnet(item[0], item[1]) + "</br>"
         page += "</br>"
@@ -73,5 +78,5 @@ def torrent_count():
 
 
 if __name__ == "__main__":
-    app.debug = True
-    app.run(host="0.0.0.0")
+    #app.run()
+    app.run(host="0.0.0.0", port=5000)

@@ -2,12 +2,12 @@ from flask import Flask, request, render_template
 from sqlalchemy import create_engine, text
 
 app = Flask(__name__)
-#engine = create_engine("postgresql://gaoyb7@localhost/dht_demo")
-#conn = engine.connect()
+engine = create_engine("postgresql://gaoyb7@localhost/dht_demo")
+conn = engine.connect()
 
 @app.route("/")
 def index():
-    return render_template("base.html")
+    return render_template("base.html", total_torrents=torrents_count())
 
 
 @app.route("/search")
@@ -25,9 +25,16 @@ def search():
             to_tsquery('english', '%s')''' % kw
     r = conn.execute(cmd)
     counts = r.rowcount
-    #page += "Magnet: " + to_magnet(item[0], item[1]) + "</br>"
+    result = []
+    cnt = 0
+    for item in r:
+        cnt += 1
+        if cnt > 100:
+            break
+        result.append((item[1], to_magnet(item[0], item[1])))
 
-    return render_template("search.html", match_torrents_count=counts, total_torrents=100)
+    return render_template("search.html", match_torrents_count=counts, 
+        total_torrents=torrents_count(), result=result)
 
 
 def to_magnet(infohash, name):
@@ -46,4 +53,4 @@ def torrents_count():
 if __name__ == "__main__":
     app.template_folder = "simServer/templates"
     app.debug = True
-    app.run(port=8080)
+    app.run(host="0.0.0.0", port=5000)

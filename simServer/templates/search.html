@@ -20,6 +20,12 @@
                      <td>Hudejuwiy.1996.x264.BDRip.(1080p).olegek70.mkv</td>
                      <td>magnet:?xt=urn:btih:9e7e03598b2e8714ad93cd54f9b80fb2e0eb244f&dn=Hudejuwiy.1996.x264.BDRip.(1080p).olegek70.mkv</td>
                  </tr>
+                 {% for item in result %}
+                 <tr>
+                     <td>{{ item[0] }}</td>
+                     <td>{{ item[1] }}</td>
+                 </tr>
+                 {% endfor %}
              </tbody>
         </table>
     </div>

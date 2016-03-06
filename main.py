@@ -13,9 +13,9 @@ from sqlalchemy.sql import select
 metadata = MetaData()
 
 hash_tab = Table("hash_tab", metadata,
-                 Column("infohash", String(40), primary_key=True),
-                 Column("name", String(128)),
-                 )
+        Column("infohash", String(40), primary_key=True),
+        Column("name", String(128)),
+        )
 
 class Master(threading.Thread):
     def __init__(self):
@@ -35,6 +35,7 @@ class Master(threading.Thread):
         while True:
             if self.que.empty():
                 sleep(1)
+                continue
             else:
                 r = self.que.get()
                 self.log_in_database_demo(r[1], r[2])
@@ -46,7 +47,7 @@ class Master(threading.Thread):
         dt.setDaemon(True)
         dt.start()
         while True:
-            if threading.activeCount() < 200:
+            if threading.activeCount() < 1500:
                 if self.que.qsize() == 0:
                     sleep(1)
                     continue
@@ -70,6 +71,9 @@ class Master(threading.Thread):
     def log(self, nid, infohash, name, address):
         print("%s %s" % (codecs.encode(infohash, "hex_codec").decode(), name.decode()))
         #fetch_metadata(nid, infohash, address)
+        #print(self.que.qsize())
+        if self.que.qsize() > 5000:
+            sleep(1)
         self.que.put([nid, codecs.encode(infohash, "hex_codec").decode(), name.decode()])
         #print(self.que.qsize())
         #print(infohash, self.que.qsize(), threading.activeCount())
@@ -78,6 +82,6 @@ class Master(threading.Thread):
 if __name__ == "__main__":
     master = Master()
     master.start()
-    dht = btdht(master, "0.0.0.0", 6881, 200)
+    dht = btdht(master, "0.0.0.0", 6881, 100)
     dht.start()
     dht.auto_send_find_node()
