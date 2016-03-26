@@ -12,18 +12,10 @@
                 </tr>
             </thead>
              <tbody>
-                 <tr>
-                     <td>SNIS-409</td>
-                     <td>magnet:?xt=urn:btih:21ef9bf7a86b62a749d416b7bd1519b91c471b89&dn=SNIS-409</td>
-                 </tr>
-                 <tr>
-                     <td>Hudejuwiy.1996.x264.BDRip.(1080p).olegek70.mkv</td>
-                     <td>magnet:?xt=urn:btih:9e7e03598b2e8714ad93cd54f9b80fb2e0eb244f&dn=Hudejuwiy.1996.x264.BDRip.(1080p).olegek70.mkv</td>
-                 </tr>
                  {% for item in result %}
                  <tr>
-                     <td>{{ item[0] }}</td>
                      <td>{{ item[1] }}</td>
+                     <td><a href="magnet:?xt=urn:btih:{{ item[0] }}&dn={{ item[1] }}">magnet:?xt=urn:btih:{{ item[0] }}</a></td>
                  </tr>
                  {% endfor %}
              </tbody>

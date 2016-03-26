@@ -31,15 +31,16 @@ def search():
         cnt += 1
         if cnt > 100:
             break
-        result.append((item[1], to_magnet(item[0], item[1])))
+        result.append((item[0], item[1]))
 
+    print("ok")
     return render_template("search.html", match_torrents_count=counts, 
         total_torrents=torrents_count(), result=result)
 
 
 def to_magnet(infohash, name):
-    magnet = "magnet:?xt=urn:btih:" + infohash
-    magnet += "&dn=" + name
+    magnet_base = "magnet:?xt=urn:btih:" + infohash
+    magnet = magnet_base + "&dn=" + name
     return magnet
 
 
@@ -52,5 +53,5 @@ def torrents_count():
 
 if __name__ == "__main__":
     app.template_folder = "simServer/templates"
-    app.debug = True
+    app.debug = False
     app.run(host="0.0.0.0", port=5000)

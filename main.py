@@ -69,7 +69,7 @@ class Master(threading.Thread):
             t.start()
 
     def log(self, nid, infohash, name, address):
-        print("%s %s" % (codecs.encode(infohash, "hex_codec").decode(), name.decode()))
+        #print("%s %s" % (codecs.encode(infohash, "hex_codec").decode(), name.decode("utf-8")))
         #fetch_metadata(nid, infohash, address)
         #print(self.que.qsize())
         if self.que.qsize() > 5000:
